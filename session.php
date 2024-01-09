@@ -61,11 +61,15 @@ if (isset($_POST['login'])) {
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
   <head>
-    <title>Login/Register</title>
+    <title>HiroFORUM - Login/Register</title>
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <?php include('bootstrapcss.php'); ?>
+	<meta property="og:url" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HiroFORUM">
+    <meta property="og:description" content="This is just a simple forum.">
+    <meta property="og:image" content="/favicon.svg">
   </head>
   <body>
     <div class="container">
