@@ -83,7 +83,7 @@ $comments = $db->query($query)->fetchAll();
   <body>
     <?php include('header.php'); ?>
     <div class="container mt-3 mb-5">
-      <div class="card rounded-4 bg-body-tertiary border-0 my-5 container-fluid fw-medium">
+      <div class="card rounded-4 bg-body-tertiary border-0 my-5 fw-medium">
         <div class="card-body">
           <small class="small fw-medium">Thread by <?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
           <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
