@@ -144,14 +144,16 @@ $comments = $db->query($query)->fetchAll();
                   echo "Sorry, no text...";
                 }
 
-                function getYouTubeVideoId($url)
-                {
-                  $videoId = '';
-                  $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
-                  if (preg_match($pattern, $url, $matches)) {
-                    $videoId = $matches[1];
+                if (!function_exists('getYouTubeVideoId')) {
+                  function getYouTubeVideoId($urlComment)
+                  {
+                    $videoId = '';
+                    $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+                    if (preg_match($pattern, $urlComment, $matches)) {
+                      $videoId = $matches[1];
+                    }
+                    return $videoId;
                   }
-                  return $videoId;
                 }
               ?>
             </div>
