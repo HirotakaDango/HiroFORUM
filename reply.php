@@ -59,7 +59,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Fetch post information
-$query = "SELECT posts.id, posts.title, posts.content, posts.user_id, posts.date, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id = '$id'";
+$query = "SELECT posts.id, posts.title, posts.content, posts.user_id, posts.date, users.username, users.id AS userid FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id = '$id'";
 $post = $db->query($query)->fetch();
 
 // Get comments for the current page, ordered by id in descending order
@@ -80,8 +80,24 @@ $comments = $db->query($query)->fetchAll();
     <div class="container mt-3 mb-5">
       <div class="card rounded-4 bg-body-tertiary border-0 my-5 container-fluid fw-medium">
         <div class="card-body">
-          <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
+          <small class="small fw-medium">Thread by <?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
+          <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
+            <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
+          <?php endif; ?>
+          <h5 class="mb-2 fw-bold mt-5"><?php echo $post['title']; ?></h5>
           <?php
+            if (!function_exists('getYouTubeVideoId')) {
+              function getYouTubeVideoId($urlCommentThread)
+              {
+                $videoIdThread = '';
+                $patternThread = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+                if (preg_match($patternThread, $urlCommentThread, $matchesThread)) {
+                  $videoIdThread = $matchesThread[1];
+                }
+                return $videoIdThread;
+              }
+            }
+
             $mainTextThread = isset($post['content']) ? $post['content'] : '';
 
             if (!empty($mainTextThread)) {
@@ -116,18 +132,6 @@ $comments = $db->query($query)->fetchAll();
             } else {
               echo "Sorry, no text...";
             }
-
-            if (!function_exists('getYouTubeVideoId')) {
-              function getYouTubeVideoId($urlCommentThread)
-              {
-                $videoIdThread = '';
-                $patternThread = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
-                if (preg_match($patternThread, $urlCommentThread, $matchesThread)) {
-                  $videoId = $matchesThread[1];
-                }
-                return $videoIdThread;
-              }
-            }
           ?>
         </div>
       </div>
@@ -153,6 +157,18 @@ $comments = $db->query($query)->fetchAll();
             </div>
             <div>
               <?php
+                if (!function_exists('getYouTubeVideoId')) {
+                  function getYouTubeVideoId($urlComment)
+                  {
+                    $videoId = '';
+                    $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+                    if (preg_match($pattern, $urlComment, $matches)) {
+                      $videoId = $matches[1];
+                    }
+                    return $videoId;
+                  }
+                }
+
                 $replyText = isset($comment['comment']) ? $comment['comment'] : '';
 
                 if (!empty($replyText)) {
@@ -186,18 +202,6 @@ $comments = $db->query($query)->fetchAll();
                   }
                 } else {
                   echo "Sorry, no text...";
-                }
-
-                if (!function_exists('getYouTubeVideoId')) {
-                  function getYouTubeVideoId($urlComment)
-                  {
-                    $videoId = '';
-                    $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
-                    if (preg_match($pattern, $urlComment, $matches)) {
-                      $videoId = $matches[1];
-                    }
-                    return $videoId;
-                  }
                 }
               ?>
             </div>

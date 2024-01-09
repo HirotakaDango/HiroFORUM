@@ -14,7 +14,7 @@ if (isset($_POST['submit'])) {
   $content = nl2br($content);
   $query = "UPDATE posts SET title='$title', content='$content' WHERE id='$post_id'";
   $db->exec($query);
-  header("Location: index.php");
+  header("Location: reply.php?id=" . $post_id);
 }
 
 if (isset($_GET['id'])) {

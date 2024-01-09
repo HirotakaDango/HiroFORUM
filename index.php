@@ -38,6 +38,18 @@ $total_pages = ceil($total_posts / $posts_per_page);
             <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
             <div>
               <?php
+                if (!function_exists('getYouTubeVideoId')) {
+                  function getYouTubeVideoId($urlComment)
+                  {
+                    $videoId = '';
+                    $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+                    if (preg_match($pattern, $urlComment, $matches)) {
+                      $videoId = $matches[1];
+                    }
+                    return $videoId;
+                  }
+                }
+
                 $replyText = isset($post['content']) ? $post['content'] : '';
 
                 if (!empty($replyText)) {
@@ -71,18 +83,6 @@ $total_pages = ceil($total_posts / $posts_per_page);
                   }
                 } else {
                   echo "Sorry, no text...";
-                }
-
-                if (!function_exists('getYouTubeVideoId')) {
-                  function getYouTubeVideoId($urlComment)
-                  {
-                    $videoId = '';
-                    $pattern = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
-                    if (preg_match($pattern, $urlComment, $matches)) {
-                      $videoId = $matches[1];
-                    }
-                    return $videoId;
-                  }
                 }
               ?>
             </div>
