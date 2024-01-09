@@ -98,6 +98,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </form>
     </div>
     </main>
-    <?php include('bootstrapjs.php'); ?>
   </body>
 </html>
