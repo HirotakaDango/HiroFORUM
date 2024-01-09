@@ -24,9 +24,6 @@ if (isset($_GET['id'])) {
   if (!$post) {
     header("Location: index.php");
   }
-  $tags = htmlspecialchars($post['tags']); // encode tags
-} else {
-  header("Location: index.php");
 }
 ?>
 
