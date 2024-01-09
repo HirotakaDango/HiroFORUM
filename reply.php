@@ -89,7 +89,7 @@ $comments = $db->query($query)->fetchAll();
           <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
             <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
           <?php endif; ?>
-          <h5 class="mb-2 fw-bold mt-5"><?php echo $post['title']; ?></h5>
+          <h5 class="mb-2 fw-bold mt-3"><?php echo $post['title']; ?></h5>
           <?php
             if (!function_exists('getYouTubeVideoId')) {
               function getYouTubeVideoId($urlCommentThread)
