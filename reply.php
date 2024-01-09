@@ -99,7 +99,7 @@ $comments = $db->query($query)->fetchAll();
       <?php endif; ?>
       <br>
       <?php foreach ($comments as $comment): ?>
-        <div class="card rounded-4 bg-body-tertiary border-0 mt-2">
+        <div class="card rounded-4 bg-body-tertiary border-0 mt-1">
           <div class="card-body">
             <div class="d-flex mb-3">
               <small class="small fw-medium">Reply by <?php echo (mb_strlen($comment['username']) > 15) ? mb_substr($comment['username'], 0, 15) . '...' : $comment['username']; ?>・<?php echo (new DateTime($comment['date']))->format("Y/m/d - H:i:s"); ?></small>
