@@ -43,6 +43,7 @@ $total_pages = ceil($total_posts / $posts_per_page);
             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
               <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
             <?php endif; ?>
+            <br>
             <div class="m-2 position-absolute bottom-0 end-0">
               <a class="btn btn-sm border-0 fw-medium" href="reply.php?id=<?php echo $post['id']; ?>"><i class="bi bi-reply-fill"></i> Reply this thread</a>
             </div>
