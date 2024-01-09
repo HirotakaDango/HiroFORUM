@@ -50,7 +50,7 @@ if (isset($_GET['id'])) {
       </div>
       <div class="btn-group gap-2 w-100 mb-5">
         <a class="btn btn-danger fw-bold w-50 rounded" href="delete.php?id=<?php echo $post_id; ?>" onclick="return confirm('Are you sure?');">
-          delete this work
+          delete this thread
         </a>
         <button class="btn btn-primary fw-bold w-50 rounded" type="submit" name="submit">save changes</button>
       </div>
