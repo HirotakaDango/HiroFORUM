@@ -74,6 +74,11 @@ $comments = $db->query($query)->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reply to <?php echo $post['title']; ?></title>
     <?php include('bootstrapcss.php'); ?>
+	<meta property="og:url" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HiroFORUM">
+    <meta property="og:description" content="<?php echo $post['title']; ?>">
+    <meta property="og:image" content="/favicon.svg">
   </head>
   <body>
     <?php include('header.php'); ?>
