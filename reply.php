@@ -78,12 +78,56 @@ $comments = $db->query($query)->fetchAll();
   <body>
     <?php include('header.php'); ?>
     <div class="container mt-3 mb-5">
-      <div class="my-5 container-fluid fw-medium">
-        <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
-        <div class="small">
+      <div class="card rounded-4 bg-body-tertiary border-0 my-5 container-fluid fw-medium">
+        <div class="card-body">
+          <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
           <?php
-            if (!empty($post['content'])) foreach (explode("\n", $post['content']) as $paragraph) echo '<p class="fw-bold" style="white-space: break-spaces; overflow: hidden;">' . preg_replace_callback('/\bhttps?:\/\/\S+/i', fn($matches) => '<a href="' . htmlspecialchars($matches[0]) . '">' . htmlspecialchars($matches[0]) . '</a>', strip_tags($paragraph)) . '</p>';
-            else echo "Sorry, no text...";
+            $mainTextThread = isset($post['content']) ? $post['content'] : '';
+
+            if (!empty($mainTextThread)) {
+              $paragraphsThread = explode("\n", $mainTextThread);
+
+              foreach ($paragraphsThread as $indexThread => $paragraphThread) {
+                $textWithoutTagsThread = strip_tags($paragraphThread);
+                $patternThread = '/\bhttps?:\/\/\S+/i';
+
+                $formattedTextThread = preg_replace_callback($patternThread, function ($matchesThread) {
+                  $urlThread = htmlspecialchars($matchesThread[0]);
+
+                  // Check if the URL ends with .png, .jpg, .jpeg, or .webp
+                  if (preg_match('/\.(png|jpg|jpeg|webp)$/i', $urlThread)) {
+                    return '<a href="' . $urlThread . '" target="_blank"><img class="img-fluid rounded-4" loading="lazy" src="' . $urlThread . '" alt="Image"></a>';
+                  } elseif (strpos($urlThread, 'youtube.com') !== false) {
+                    // If the URL is from YouTube, embed it as an iframe with a very low-resolution thumbnail
+                    $videoIdThread = getYouTubeVideoId($urlThread);
+                    if ($videoIdThread) {
+                      $thumbnailUrlThread = 'https://img.youtube.com/vi/' . $videoIdThread . '/default.jpg';
+                      return '<div class="w-100 overflow-hidden position-relative ratio ratio-16x9"><iframe loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" class="rounded-4 position-absolute top-0 bottom-0 start-0 end-0 w-100 h-100 border-0 shadow" src="https://www.youtube.com/embed/' . $videoIdThread . '" frameborder="0" allowfullscreen></iframe></div>';
+                    } else {
+                      return '<a href="' . $urlThread . '">' . $urlThread . '</a>';
+                    }
+                  } else {
+                    return '<a href="' . $urlThread . '">' . $urlThread . '</a>';
+                  }
+                }, $textWithoutTagsThread);
+
+                echo "<p style=\"white-space: break-spaces; overflow: hidden;\">$formattedTextThread</p>";
+              }
+            } else {
+              echo "Sorry, no text...";
+            }
+
+            if (!function_exists('getYouTubeVideoId')) {
+              function getYouTubeVideoId($urlCommentThread)
+              {
+                $videoIdThread = '';
+                $patternThread = '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+                if (preg_match($patternThread, $urlCommentThread, $matchesThread)) {
+                  $videoId = $matchesThread[1];
+                }
+                return $videoIdThread;
+              }
+            }
           ?>
         </div>
       </div>
@@ -107,7 +151,7 @@ $comments = $db->query($query)->fetchAll();
                 <a href="reply.php?action=delete&commentId=<?php echo $comment['id']; ?>&id=<?php echo $id; ?>" style="max-height: 30px;" onclick="return confirm('Are you sure?');" class="btn btn-outline-light border-0 btn-sm ms-auto"><i class="bi bi-trash-fill"></i></a>
               <?php endif; ?>
             </div>
-            <div class="small">
+            <div>
               <?php
                 $replyText = isset($comment['comment']) ? $comment['comment'] : '';
 
@@ -115,7 +159,7 @@ $comments = $db->query($query)->fetchAll();
                   $paragraphs = explode("\n", $replyText);
 
                   foreach ($paragraphs as $index => $paragraph) {
-                    $messageTextWithoutTags = strip_tags($paragraph);
+                    $textWithoutTags = strip_tags($paragraph);
                     $pattern = '/\bhttps?:\/\/\S+/i';
 
                     $formattedText = preg_replace_callback($pattern, function ($matches) {
@@ -136,7 +180,7 @@ $comments = $db->query($query)->fetchAll();
                       } else {
                         return '<a href="' . $url . '">' . $url . '</a>';
                       }
-                    }, $messageTextWithoutTags);
+                    }, $textWithoutTags);
 
                     echo "<p style=\"white-space: break-spaces; overflow: hidden;\">$formattedText</p>";
                   }
