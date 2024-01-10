@@ -10,7 +10,7 @@ $posts_per_page = 20;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_index = ($page - 1) * $posts_per_page;
 
-$query = "SELECT posts.*, users.username, users.id AS userid FROM posts JOIN users ON posts.user_id = users.id ORDER BY posts.id DESC LIMIT $start_index, $posts_per_page";
+$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id GROUP BY posts.id ORDER BY posts.id DESC LIMIT $start_index, $posts_per_page";
 $posts = $db->query($query)->fetchAll();
 
 $count_query = "SELECT COUNT(*) FROM posts";
@@ -18,10 +18,16 @@ $total_posts = $db->query($count_query)->fetchColumn();
 $total_pages = ceil($total_posts / $posts_per_page);
 
 // Count the number of music records for the user
-$queryCount = "SELECT COUNT(*) FROM posts";
-$stmtCount = $db->prepare($queryCount);
-$stmtCount->execute();
-$postCount = $stmtCount->fetchColumn();
+$queryPostCount = "SELECT COUNT(*) FROM posts";
+$stmtPostCount = $db->prepare($queryPostCount);
+$stmtPostCount->execute();
+$postCount = $stmtPostCount->fetchColumn();
+
+// Count the number of music records for the user
+$queryReplyCount = "SELECT COUNT(*) FROM comments";
+$stmtReplyCount = $db->prepare($queryReplyCount);
+$stmtReplyCount->execute();
+$replyCount = $stmtReplyCount->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +46,8 @@ $postCount = $stmtCount->fetchColumn();
   <body>
     <?php include('header.php'); ?>
     <div class="container my-4">
-      <p class="fw-bold mb-4 small">total posts: <?php echo $postCount; ?> posts</p>
+      <h6 class="fw-bold mb-2 small">total posts: <?php echo $postCount; ?> posts</h6>
+      <h6 class="fw-bold mb-4 small">total replies: <?php echo $replyCount; ?> replies</h6>
       <?php foreach ($posts as $post): ?>
         <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
           <div class="card-body">
@@ -98,6 +105,7 @@ $postCount = $stmtCount->fetchColumn();
                 }
               ?>
             </div>
+            <p class="me-auto fw-medium small"><?php echo $post['reply_count']; ?> replies</p>
             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
               <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
             <?php endif; ?>
