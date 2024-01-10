@@ -25,7 +25,7 @@ if (isset($_POST['submit'])) {
   </head>
   <body>
     <?php include('header.php'); ?>
-    <form method="post" enctype="multipart/form-data" class="container-fluid mt-3">
+    <form method="post" enctype="multipart/form-data" class="container mt-3">
       <div class="form-floating mb-2">
         <input class="form-control rounded border-3 focus-ring focus-ring-dark" type="text" name="title" placeholder="Enter title" maxlength="100" required>  
         <label for="floatingInput" class="fw-bold"><small>Enter title</small></label>

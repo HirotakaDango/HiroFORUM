@@ -36,9 +36,8 @@ if (isset($_GET['id'])) {
     <?php include('bootstrapcss.php'); ?>
   </head>
   <body>
-    <main id="swup" class="transition-main">
     <?php include('header.php'); ?>
-    <form method="post" class="container-fluid my-4">
+    <form method="post" class="container my-4">
       <input type="hidden" name="post_id" value="<?php echo $post_id ?>">
       <div class="form-floating mb-2">
         <input class="form-control rounded border-3 focus-ring focus-ring-dark" type="text" name="title" placeholder="Enter title" maxlength="100" required value="<?php echo $post['title'] ?>">  
@@ -55,6 +54,5 @@ if (isset($_GET['id'])) {
         <button class="btn btn-primary fw-bold w-50 rounded" type="submit" name="submit">save changes</button>
       </div>
     </form>
-    </main>
   </body>
 </html>
