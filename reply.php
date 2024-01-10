@@ -139,13 +139,15 @@ $comments = $db->query($query)->fetchAll();
             }
           ?>
         </div>
+        <br>
+        <button type="button" class="btn btn-sm border-0 fw-medium m-2 position-absolute bottom-0 end-0" onclick="sharePage()"><i class="bi bi-share-fill"></i></button>
       </div>
 
       <!-- Comment form, show only if the user is logged in -->
       <?php if ($user): ?>
         <form method="post" action="reply.php?id=<?php echo $id; ?>">
-          <textarea id="comment" name="comment" class="form-control border-2 rounded-4 focus-ring focus-ring-dark rounded-bottom-0 border-botom-0" rows="6" onkeydown="if(event.keyCode == 13) { document.execCommand('insertHTML', false, '<br><br>'); return false; }"></textarea>
-          <button type="submit" class="btn w-100 btn-primary rounded-top-0 rounded-4">Submit</button>
+          <textarea id="comment" name="comment" class="form-control border-2 rounded-4 focus-ring focus-ring-dark rounded-bottom-0 border-bottom-0" rows="6" onkeydown="if(event.keyCode == 13) { document.execCommand('insertHTML', false, '<br><br>'); return false; }"></textarea>
+          <button type="submit" class="btn w-100 btn-primary rounded-top-0 rounded-4 fw-medium">Submit</button>
         </form>
       <?php else: ?>
         <h5 class="text-center">You must <a href="session.php">login</a> or <a href="session.php">register</a> to reply this thread!</h5>
@@ -214,5 +216,21 @@ $comments = $db->query($query)->fetchAll();
         </div>
       <?php endforeach; ?>
     </div>
+    <script>
+      function sharePage() {
+        if (navigator.share) {
+          navigator.share({
+            title: document.title,
+            url: window.location.href
+          }).then(() => {
+            console.log('Page shared successfully.');
+          }).catch((error) => {
+            console.error('Error sharing page:', error);
+          });
+        } else {
+          console.log('Web Share API not supported.');
+        }
+      }
+    </script>
   </body>
 </html>

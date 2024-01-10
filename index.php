@@ -16,6 +16,12 @@ $posts = $db->query($query)->fetchAll();
 $count_query = "SELECT COUNT(*) FROM posts";
 $total_posts = $db->query($count_query)->fetchColumn();
 $total_pages = ceil($total_posts / $posts_per_page);
+
+// Count the number of music records for the user
+$queryCount = "SELECT COUNT(*) FROM posts";
+$stmtCount = $db->prepare($queryCount);
+$stmtCount->execute();
+$postCount = $stmtCount->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +40,7 @@ $total_pages = ceil($total_posts / $posts_per_page);
   <body>
     <?php include('header.php'); ?>
     <div class="container my-4">
+      <p class="fw-bold mb-4 small">total posts: <?php echo $postCount; ?> posts</p>
       <?php foreach ($posts as $post): ?>
         <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
           <div class="card-body">
@@ -95,16 +102,15 @@ $total_pages = ceil($total_posts / $posts_per_page);
               <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
             <?php endif; ?>
             <br>
-            <div class="m-2 position-absolute bottom-0 end-0">
-              <a class="btn btn-sm border-0 fw-medium" href="reply.php?id=<?php echo $post['id']; ?>"><i class="bi bi-reply-fill"></i> Reply this thread</a>
-            </div>
+            <a class="btn btn-sm border-0 fw-medium m-2 position-absolute bottom-0 end-0" href="reply.php?id=<?php echo $post['id']; ?>"><i class="bi bi-reply-fill"></i> Reply this thread</a>
+            <button type="button" class="btn btn-sm border-0 fw-medium m-2 position-absolute bottom-0 start-0" onclick="sharePost(<?php echo $post['id']; ?>)"><i class="bi bi-share-fill"></i></button>
           </div>
         </div>
       <?php endforeach; ?>
     </div>
     <div class="pagination my-4 justify-content-center gap-2">
       <?php if ($page > 1): ?>
-        <a class="btn btn-sm fw-bold btn-primary" href="?page=<?php echo $page - 1 ?>">Prev</a>
+        <a class="btn btn-sm fw-bold btn-outline-light" href="?page=<?php echo $page - 1 ?>">Prev</a>
       <?php endif ?>
 
       <?php
@@ -113,12 +119,32 @@ $total_pages = ceil($total_posts / $posts_per_page);
 
       for ($i = $start_page; $i <= $end_page; $i++):
       ?>
-        <a class="btn btn-sm fw-bold btn-primary <?php echo ($i == $page) ? 'active' : ''; ?>" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+        <a class="btn btn-sm fw-bold btn-outline-light <?php echo ($i == $page) ? 'active' : ''; ?>" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
       <?php endfor ?>
 
       <?php if ($page < $total_pages): ?>
-        <a class="btn btn-sm fw-bold btn-primary" href="?page=<?php echo $page + 1 ?>">Next</a>
+        <a class="btn btn-sm fw-bold btn-outline-light" href="?page=<?php echo $page + 1 ?>">Next</a>
       <?php endif ?>
     </div>
+    <script>
+      function sharePost(userId) {
+        // Compose the share URL
+        var shareUrl = 'reply.php?id=' + userId;
+
+        // Check if the Share API is supported by the browser
+        if (navigator.share) {
+          navigator.share({
+          url: shareUrl
+        })
+          .then(() => console.log('Shared successfully.'))
+          .catch((error) => console.error('Error sharing:', error));
+        } else {
+          console.log('Share API is not supported in this browser.');
+          // Provide an alternative action for browsers that do not support the Share API
+          // For example, you can open a new window with the share URL
+          window.open(shareUrl, '_blank');
+        }
+      }
+    </script>
   </body>
 </html>
