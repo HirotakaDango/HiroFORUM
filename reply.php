@@ -83,7 +83,20 @@ $comments = $db->query($query)->fetchAll();
   <body>
     <?php include('header.php'); ?>
     <div class="container mt-3 mb-5">
-      <div class="card rounded-4 bg-body-tertiary border-0 my-5 fw-medium">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-4" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);">
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis text-decoration-none" href="index.php">home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis text-decoration-none" href="#">thread</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis text-decoration-none fw-bold" href="#">post #<?php echo $id; ?></a>
+          </li>
+        </ol>
+      </nav>
+      <div class="card rounded-4 bg-body-tertiary border-0 mb-5 fw-medium">
         <div class="card-body">
           <small class="small fw-medium">Thread by <?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
           <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
@@ -215,20 +228,6 @@ $comments = $db->query($query)->fetchAll();
           </div>
         </div>
       <?php endforeach; ?>
-    </div>
-    <button type="button" class="btn btn-outline-light rounded-pill border-0 btn-sm position-fixed end-0 bottom-0 m-2 fw-medium" data-bs-toggle="modal" data-bs-target="#exampleModal">help</button>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0">
-          <div class="modal-header border-0">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Help</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            If you want to upload image, use image link address, only support jpg, jpeg, png, and gif.
-          </div>
-        </div>
-      </div>
     </div>
     <script>
       function sharePage() {
