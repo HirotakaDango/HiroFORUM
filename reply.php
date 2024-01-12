@@ -63,7 +63,7 @@ $query = "SELECT posts.id, posts.title, posts.content, posts.user_id, posts.date
 $post = $db->query($query)->fetch();
 
 // Get comments for the current page, ordered by id in descending order
-$query = "SELECT * FROM comments WHERE post_id='$id' ORDER BY id ASC";
+$query = "SELECT comments.id, comments.username, comments.comment, comments.date, comments.post_id, users.username AS commenter_username, users.id AS userid FROM comments JOIN users ON comments.username = users.username WHERE comments.post_id='$id' ORDER BY comments.id ASC";
 $comments = $db->query($query)->fetchAll();
 ?>
 
@@ -98,7 +98,7 @@ $comments = $db->query($query)->fetchAll();
       </nav>
       <div class="card rounded-4 bg-body-tertiary border-0 mb-5 fw-medium">
         <div class="card-body">
-          <small class="small fw-medium">Thread by <?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
+          <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
           <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
             <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
           <?php endif; ?>
@@ -170,7 +170,7 @@ $comments = $db->query($query)->fetchAll();
         <div class="card rounded-4 bg-body-tertiary border-0 mt-1">
           <div class="card-body">
             <div class="d-flex mb-3">
-              <small class="small fw-medium">Reply by <?php echo (mb_strlen($comment['username']) > 15) ? mb_substr($comment['username'], 0, 15) . '...' : $comment['username']; ?>・<?php echo (new DateTime($comment['date']))->format("Y/m/d - H:i:s"); ?></small>
+              <small class="small fw-medium">Reply by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $comment['userid']; ?>"><?php echo (mb_strlen($comment['username']) > 15) ? mb_substr($comment['username'], 0, 15) . '...' : $comment['username']; ?></a>・<?php echo (new DateTime($comment['date']))->format("Y/m/d - H:i:s"); ?></small>
               <?php if ($user && $comment['username'] == $user['username']): ?>
                 <a href="reply.php?action=delete&commentId=<?php echo $comment['id']; ?>&id=<?php echo $id; ?>" style="max-height: 30px;" onclick="return confirm('Are you sure?');" class="btn btn-outline-light border-0 btn-sm ms-auto"><i class="bi bi-trash-fill"></i></a>
               <?php endif; ?>

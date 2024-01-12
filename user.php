@@ -10,7 +10,42 @@ $posts_per_page = 20;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_index = ($page - 1) * $posts_per_page;
 
-// Modify your existing query based on the selected sorting option
+// Check if 'user_id' is set in the session, otherwise retrieve it from the database
+$userid = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// Retrieve the user ID from the database if it's not set in the session
+if ($userid === null) {
+    // Replace 'your_username' with the actual username of the logged-in user
+    $loggedInUsername = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+    
+    // Fetch the user ID from the database based on the username
+    $userQuery = $db->prepare("SELECT id FROM users WHERE username = :username");
+    $userQuery->bindParam(':username', $loggedInUsername, PDO::PARAM_STR);
+    $userQuery->execute();
+    $userData = $userQuery->fetch(PDO::FETCH_ASSOC);
+
+    if ($userData) {
+        $userid = $userData['id'];
+        $_SESSION['user_id'] = $userid; // Update the session with the retrieved user ID
+    }
+}
+
+// Get the user ID from the URL parameter 'id'
+$user_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+
+// Fetch the username for the current user ID
+$userName = "";
+if ($user_id !== null) {
+  $userQuery = $db->prepare("SELECT username FROM users WHERE id = :user_id");
+  $userQuery->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+  $userQuery->execute();
+  $userData = $userQuery->fetch(PDO::FETCH_ASSOC);
+  if ($userData) {    
+    $userName = $userData['username'];
+  }
+}
+
+// Modify your existing query based on the selected sorting option and user ID
 $sort_option = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
 
 switch ($sort_option) {
@@ -21,24 +56,27 @@ switch ($sort_option) {
     $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
     break;
   default:
-  $order_by = 'ORDER BY posts.id DESC';
+    $order_by = 'ORDER BY posts.id DESC';
 }
 
-$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
+// Add a condition to filter posts based on the user ID
+$user_condition = $user_id !== null ? "WHERE users.id = $user_id" : '';
+
+$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id $user_condition GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
 $posts = $db->query($query)->fetchAll();
 
-$count_query = "SELECT COUNT(*) FROM posts";
+$count_query = "SELECT COUNT(*) FROM posts JOIN users ON posts.user_id = users.id $user_condition";
 $total_posts = $db->query($count_query)->fetchColumn();
 $total_pages = ceil($total_posts / $posts_per_page);
 
 // Count the number of music records for the user
-$queryPostCount = "SELECT COUNT(*) FROM posts";
+$queryPostCount = "SELECT COUNT(*) FROM posts JOIN users ON posts.user_id = users.id $user_condition";
 $stmtPostCount = $db->prepare($queryPostCount);
 $stmtPostCount->execute();
 $postCount = $stmtPostCount->fetchColumn();
 
 // Count the number of music records for the user
-$queryReplyCount = "SELECT COUNT(*) FROM comments";
+$queryReplyCount = "SELECT COUNT(*) FROM comments JOIN posts ON comments.post_id = posts.id JOIN users ON posts.user_id = users.id $user_condition";
 $stmtReplyCount = $db->prepare($queryReplyCount);
 $stmtReplyCount->execute();
 $replyCount = $stmtReplyCount->fetchColumn();
@@ -60,23 +98,25 @@ $replyCount = $stmtReplyCount->fetchColumn();
   <body>
     <?php include('header.php'); ?>
     <div class="container my-4">
+      <h6 class="fw-bold mb-2 small">username: <?php echo $userName; ?></h6>
       <h6 class="fw-bold mb-2 small">total posts: <?php echo $postCount; ?> posts</h6>
       <h6 class="fw-bold mb-2 small">total replies: <?php echo $replyCount; ?> replies</h6>
       <div class="mb-3 small">
-        <form method="get" action="index.php" class="d-flex justify-content-start align-content-center align-items-center">
+        <form method="get" action="user.php" class="d-flex justify-content-start align-content-center align-items-center">
           <label for="sort" class="fw-bold">Sort by:</label>
           <select class="ms-2 form-select form-select-sm rounded-4" name="sort" id="sort" onchange="this.form.submit()" style="max-width: 130px;">
             <option value="latest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'latest') ? 'selected' : ''; ?>>latest</option>
             <option value="oldest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : ''; ?>>oldest</option>
             <option value="most_replied" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'most_replied') ? 'selected' : ''; ?>>most replied</option>
           </select>
+          <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? htmlspecialchars($_GET['id']) : ''; ?>">
         </form>
       </div>
       <?php foreach ($posts as $post): ?>
         <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
           <div class="card-body">
             <div class="d-flex mb-3">
-              <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
+              <small class="small fw-medium">Thread by <?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
             </div>
             <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
             <div>
