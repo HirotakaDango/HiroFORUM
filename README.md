@@ -1,2 +1,2 @@
 # HiroFORUM
-This is just a lightweight imageboard forum using SQLite
+This is just a lightweight image board forum using SQLite
