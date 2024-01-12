@@ -10,7 +10,21 @@ $posts_per_page = 20;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_index = ($page - 1) * $posts_per_page;
 
-$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id GROUP BY posts.id ORDER BY posts.id DESC LIMIT $start_index, $posts_per_page";
+// Modify your existing query based on the selected sorting option
+$sort_option = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
+
+switch ($sort_option) {
+  case 'oldest':
+    $order_by = 'ORDER BY posts.id ASC';
+    break;
+  case 'most_replied':
+    $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
+    break;
+  default:
+  $order_by = 'ORDER BY posts.id DESC';
+}
+
+$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
 $posts = $db->query($query)->fetchAll();
 
 $count_query = "SELECT COUNT(*) FROM posts";
@@ -47,7 +61,17 @@ $replyCount = $stmtReplyCount->fetchColumn();
     <?php include('header.php'); ?>
     <div class="container my-4">
       <h6 class="fw-bold mb-2 small">total posts: <?php echo $postCount; ?> posts</h6>
-      <h6 class="fw-bold mb-4 small">total replies: <?php echo $replyCount; ?> replies</h6>
+      <h6 class="fw-bold mb-2 small">total replies: <?php echo $replyCount; ?> replies</h6>
+      <div class="mb-3 small">
+        <form method="get" action="index.php" class="d-flex justify-content-start align-content-center align-items-center">
+          <label for="sort" class="fw-bold">Sort by:</label>
+          <select class="ms-2 form-select form-select-sm rounded-4" name="sort" id="sort" onchange="this.form.submit()" style="max-width: 130px;">
+            <option value="latest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'latest') ? 'selected' : ''; ?>>latest</option>
+            <option value="oldest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : ''; ?>>oldest</option>
+            <option value="most_replied" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'most_replied') ? 'selected' : ''; ?>>most replied</option>
+          </select>
+        </form>
+      </div>
       <?php foreach ($posts as $post): ?>
         <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
           <div class="card-body">
