@@ -100,7 +100,7 @@ $comments = $db->query($query)->fetchAll();
         <div class="card-body">
           <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
           <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
-            <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
+            <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0 link-body-emphasis" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
           <?php endif; ?>
           <h5 class="mb-2 fw-bold mt-3"><?php echo $post['title']; ?></h5>
           <?php
@@ -153,7 +153,7 @@ $comments = $db->query($query)->fetchAll();
           ?>
         </div>
         <br>
-        <button type="button" class="btn btn-sm border-0 fw-medium m-2 position-absolute bottom-0 end-0" onclick="sharePage()"><i class="bi bi-share-fill"></i></button>
+        <button type="button" class="btn btn-sm border-0 fw-medium m-2 position-absolute bottom-0 end-0 link-body-emphasis" onclick="sharePage()"><i class="bi bi-share-fill"></i></button>
       </div>
 
       <!-- Comment form, show only if the user is logged in -->
