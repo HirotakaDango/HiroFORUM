@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Retrieve the list of albums created by the current user
-$stmt = $db->prepare('SELECT * FROM category ORDER BY id DESC');
+$stmt = $db->prepare('SELECT * FROM category ORDER BY category_name ASC');
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

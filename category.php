@@ -17,14 +17,14 @@ $category = isset($_GET['q']) ? urldecode($_GET['q']) : '';
 $sort_option = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
 
 switch ($sort_option) {
-    case 'oldest':
-        $order_by = 'ORDER BY posts.id ASC';
-        break;
-    case 'most_replied':
-        $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
-        break;
-    default:
-        $order_by = 'ORDER BY posts.id DESC';
+  case 'oldest':
+    $order_by = 'ORDER BY posts.id ASC';
+    break;
+  case 'most_replied':
+    $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
+    break;
+  default:
+  $order_by = 'ORDER BY posts.id DESC';
 }
 
 // Include the category filter in the query using prepared statements
