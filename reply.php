@@ -88,7 +88,7 @@ $categories = $db->query($category_query)->fetchAll();
     <?php include('header.php'); ?>
     <div class="container mt-3 mb-5">
       <div class="row">
-        <div class="col-md-4 d-none d-md-block>
+        <div class="col-md-4 d-none d-md-block">
           <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
             <div class="card-body fw-medium">
               <h4>Categories</h4>

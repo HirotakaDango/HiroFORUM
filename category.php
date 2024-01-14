@@ -63,7 +63,7 @@ $categories = $db->query($category_query)->fetchAll();
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
   <head>
-    <title>HiroFORUM</title>
+    <title><?php echo str_replace('_', ' ', $category); ?></title>
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php include('bootstrapcss.php'); ?>
