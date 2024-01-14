@@ -3,44 +3,55 @@ session_start();
 
 $db = new PDO('sqlite:database.db');
 $db->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, password TEXT NOT NULL)");
-$db->exec("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, user_id INTEGER NOT NULL, date DATETIME, category TEXT, FOREIGN KEY (user_id) REFERENCES users(id))");
+$db->exec("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, user_id INTEGER NOT NULL, date DATETIME, category TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id))");
 $db->exec("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, comment TEXT, date DATETIME, post_id TEXT)");
-$db->exec("CREATE TABLE IF NOT EXISTS category (id INTEGER PRIMARY KEY AUTOINCREMENT, category_name TEXT)");
 
 $posts_per_page = 20;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_index = ($page - 1) * $posts_per_page;
 
-// Modify your existing query based on the selected sorting option
+// Get the category from the URL parameter and URL decode it
+$category = isset($_GET['q']) ? urldecode($_GET['q']) : '';
+
+// Modify your existing query based on the selected sorting option and category filter
 $sort_option = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
 
 switch ($sort_option) {
-  case 'oldest':
-    $order_by = 'ORDER BY posts.id ASC';
-    break;
-  case 'most_replied':
-    $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
-    break;
-  default:
-  $order_by = 'ORDER BY posts.id DESC';
+    case 'oldest':
+        $order_by = 'ORDER BY posts.id ASC';
+        break;
+    case 'most_replied':
+        $order_by = 'ORDER BY reply_count DESC, posts.id DESC';
+        break;
+    default:
+        $order_by = 'ORDER BY posts.id DESC';
 }
 
-$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
-$posts = $db->query($query)->fetchAll();
+// Include the category filter in the query using prepared statements
+$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id WHERE posts.category = :category GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':category', $category, PDO::PARAM_STR);
+$stmt->execute();
+$posts = $stmt->fetchAll();
 
-$count_query = "SELECT COUNT(*) FROM posts";
-$total_posts = $db->query($count_query)->fetchColumn();
+$count_query = "SELECT COUNT(*) FROM posts WHERE category = :category";
+$stmtPostCount = $db->prepare($count_query);
+$stmtPostCount->bindParam(':category', $category, PDO::PARAM_STR);
+$stmtPostCount->execute();
+$total_posts = $stmtPostCount->fetchColumn();
 $total_pages = ceil($total_posts / $posts_per_page);
 
-// Count the number of music records for the user
-$queryPostCount = "SELECT COUNT(*) FROM posts";
+// Count the number of posts
+$queryPostCount = "SELECT COUNT(*) FROM posts WHERE category = :category";
 $stmtPostCount = $db->prepare($queryPostCount);
+$stmtPostCount->bindParam(':category', $category, PDO::PARAM_STR);
 $stmtPostCount->execute();
 $postCount = $stmtPostCount->fetchColumn();
 
-// Count the number of music records for the user
-$queryReplyCount = "SELECT COUNT(*) FROM comments";
+// Count the number of replies
+$queryReplyCount = "SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE category = :category)";
 $stmtReplyCount = $db->prepare($queryReplyCount);
+$stmtReplyCount->bindParam(':category', $category, PDO::PARAM_STR);
 $stmtReplyCount->execute();
 $replyCount = $stmtReplyCount->fetchColumn();
 
@@ -68,17 +79,18 @@ $categories = $db->query($category_query)->fetchAll();
       <h6 class="fw-bold mb-2 small">total posts: <?php echo $postCount; ?> posts</h6>
       <h6 class="fw-bold mb-2 small">total replies: <?php echo $replyCount; ?> replies</h6>
       <div class="mb-3 small">
-        <form method="get" action="index.php" class="d-flex justify-content-start align-content-center align-items-center">
+        <form method="get" action="category.php" class="d-flex justify-content-start align-content-center align-items-center">
           <label for="sort" class="fw-bold">Sort by:</label>
           <select class="ms-2 form-select form-select-sm rounded-4" name="sort" id="sort" onchange="this.form.submit()" style="max-width: 130px;">
             <option value="latest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'latest') ? 'selected' : ''; ?>>latest</option>
             <option value="oldest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : ''; ?>>oldest</option>
             <option value="most_replied" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'most_replied') ? 'selected' : ''; ?>>most replied</option>
           </select>
+          <input type="hidden" name="q" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>">
         </form>
       </div>
       <div class="row">
-        <div class="col-md-4 d-none d-md-block">
+        <div class="col-md-4">
           <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
             <div class="card-body fw-medium">
               <h4>Categories</h4>
@@ -99,8 +111,7 @@ $categories = $db->query($category_query)->fetchAll();
                 <div class="d-flex mb-3">
                   <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
                 </div>
-                <a class="btn btn-dark btn-sm fw-medium rounded-pill link-body-emphasis mb-2" href="category.php?q=<?php echo urlencode($post['category']); ?>"><?php echo str_replace('_', ' ', $post['category']); ?></a>
-                <h5 class="fw-bold mb-3"><?php echo $post['title']; ?></h5>
+                <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
                 <div>
                   <?php
                     if (!function_exists('getYouTubeVideoId')) {
