@@ -88,20 +88,7 @@ $categories = $db->query($category_query)->fetchAll();
     <?php include('header.php'); ?>
     <div class="container mt-3 mb-5">
       <div class="row">
-        <div class="col-md-4 d-none d-md-block">
-          <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
-            <div class="card-body fw-medium">
-              <h4>Categories</h4>
-              <ul>
-                <?php foreach ($categories as $category): ?>
-                  <li>
-                    <a class="text-decoration-none link-body-emphasis" href="category.php?q=<?php echo urlencode($category['category']); ?>"><?php echo str_replace('_', ' ', $category['category']); ?> (<?php echo $category['post_count']; ?> posts)</a>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <?php include('categories.php'); ?>
         <div class="col-md-8">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-4" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);">

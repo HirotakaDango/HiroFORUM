@@ -78,20 +78,7 @@ $categories = $db->query($category_query)->fetchAll();
         </form>
       </div>
       <div class="row">
-        <div class="col-md-4 d-none d-md-block">
-          <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
-            <div class="card-body fw-medium">
-              <h4>Categories</h4>
-              <ul>
-                <?php foreach ($categories as $category): ?>
-                  <li>
-                    <a class="text-decoration-none link-body-emphasis" href="category.php?q=<?php echo urlencode($category['category']); ?>"><?php echo str_replace('_', ' ', $category['category']); ?> (<?php echo $category['post_count']; ?> posts)</a>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <?php include('categories.php'); ?>
         <div class="col-md-8">
           <?php foreach ($posts as $post): ?>
             <div class="card border-0 shadow mb-1 position-relative bg-body-tertiary rounded-4">
