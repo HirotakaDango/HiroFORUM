@@ -23,6 +23,25 @@
               echo '<a class="btn btn-outline-light border-0 fw-bold rounded" href="session.php"><small>login</small></a>';
             }
           ?>
+          <a class="d-none d-md-block btn btn-outline-light border-0 fw-bold rounded <?php if(basename($_SERVER['PHP_SELF']) == 'search.php') echo 'active' ?>" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><small>search</small></a>
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content bg-transparent border-0">
+                <div class="modal-body">
+                  <form class="input-group" role="search" action="search.php">
+                    <input class="form-control rounded-start-4 border-0 bg-body-tertiary focus-ring focus-ring-dark" name="q" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn rounded-end-4 border-0 bg-body-tertiary" type="submit"><i class="bi bi-search"></i></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
+      </div>
+      <div class="d-md-none mt-3">
+        <form class="input-group" role="search" action="search.php">
+          <input class="form-control rounded-start-4 border-0 bg-body-tertiary focus-ring focus-ring-dark" name="q" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn rounded-end-4 border-0 bg-body-tertiary" type="submit"><i class="bi bi-search"></i></button>
+        </form>
       </div>
     </div>

@@ -10,13 +10,13 @@ $posts_per_page = 20;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_index = ($page - 1) * $posts_per_page;
 
-// Get the category from the URL parameter and URL decode it
-$category = isset($_GET['q']) ? urldecode($_GET['q']) : '';
+// Get the search query from the URL parameter and URL decode it
+$searchQuery = isset($_GET['q']) ? urldecode($_GET['q']) : '';
 
 // Use a custom variable for the category without URL encoding
-$pageCategory = isset($_GET['q']) ? $_GET['q'] : '';
+$pageSearch = isset($_GET['q']) ? $_GET['q'] : '';
 
-// Modify your existing query based on the selected sorting option and category filter
+// Modify your existing query based on the selected sorting option and search filter
 $sort_option = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
 
 switch ($sort_option) {
@@ -30,31 +30,31 @@ switch ($sort_option) {
   $order_by = 'ORDER BY posts.id DESC';
 }
 
-// Include the category filter in the query using prepared statements
-$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id WHERE posts.category = :category GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
+// Include the search filter in the query using prepared statements
+$query = "SELECT posts.*, users.username, users.id AS userid, COUNT(comments.id) AS reply_count FROM posts JOIN users ON posts.user_id = users.id LEFT JOIN comments ON posts.id = comments.post_id WHERE posts.title LIKE :searchQuery OR posts.content LIKE :searchQuery GROUP BY posts.id $order_by LIMIT $start_index, $posts_per_page";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':category', $category, PDO::PARAM_STR);
+$stmt->bindValue(':searchQuery', "%$searchQuery%", PDO::PARAM_STR);
 $stmt->execute();
 $posts = $stmt->fetchAll();
 
-$count_query = "SELECT COUNT(*) FROM posts WHERE category = :category";
+$count_query = "SELECT COUNT(*) FROM posts WHERE title LIKE :searchQuery OR content LIKE :searchQuery";
 $stmtPostCount = $db->prepare($count_query);
-$stmtPostCount->bindParam(':category', $category, PDO::PARAM_STR);
+$stmtPostCount->bindValue(':searchQuery', "%$searchQuery%", PDO::PARAM_STR);
 $stmtPostCount->execute();
 $total_posts = $stmtPostCount->fetchColumn();
 $total_pages = ceil($total_posts / $posts_per_page);
 
 // Count the number of posts
-$queryPostCount = "SELECT COUNT(*) FROM posts WHERE category = :category";
+$queryPostCount = "SELECT COUNT(*) FROM posts WHERE title LIKE :searchQuery OR content LIKE :searchQuery";
 $stmtPostCount = $db->prepare($queryPostCount);
-$stmtPostCount->bindParam(':category', $category, PDO::PARAM_STR);
+$stmtPostCount->bindValue(':searchQuery', "%$searchQuery%", PDO::PARAM_STR);
 $stmtPostCount->execute();
 $postCount = $stmtPostCount->fetchColumn();
 
 // Count the number of replies
-$queryReplyCount = "SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE category = :category)";
+$queryReplyCount = "SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE title LIKE :searchQuery OR content LIKE :searchQuery)";
 $stmtReplyCount = $db->prepare($queryReplyCount);
-$stmtReplyCount->bindParam(':category', $category, PDO::PARAM_STR);
+$stmtReplyCount->bindValue(':searchQuery', "%$searchQuery%", PDO::PARAM_STR);
 $stmtReplyCount->execute();
 $replyCount = $stmtReplyCount->fetchColumn();
 
@@ -66,7 +66,7 @@ $categories = $db->query($category_query)->fetchAll();
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
   <head>
-    <title><?php echo str_replace('_', ' ', $category); ?></title>
+    <title>Search for <?php echo str_replace('_', ' ', $searchQuery); ?></title>
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php include('bootstrapcss.php'); ?>
@@ -82,7 +82,7 @@ $categories = $db->query($category_query)->fetchAll();
       <h6 class="fw-bold mb-2 small">total posts: <?php echo $postCount; ?> posts</h6>
       <h6 class="fw-bold mb-2 small">total replies: <?php echo $replyCount; ?> replies</h6>
       <div class="mb-3 small">
-        <form method="get" action="category.php" class="d-flex justify-content-start align-content-center align-items-center">
+        <form method="get" action="search.php" class="d-flex justify-content-start align-content-center align-items-center">
           <label for="sort" class="fw-bold">Sort by:</label>
           <select class="ms-2 form-select form-select-sm rounded-4" name="sort" id="sort" onchange="this.form.submit()" style="max-width: 130px;">
             <option value="latest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'latest') ? 'selected' : ''; ?>>latest</option>
@@ -189,7 +189,7 @@ $categories = $db->query($category_query)->fetchAll();
     </div>
     <div class="pagination my-4 justify-content-center gap-2">
       <?php if ($page > 1): ?>
-        <a class="btn btn-sm fw-bold btn-outline-light" href="?q=<?php echo urlencode($pageCategory); ?>&page=<?php echo $page - 1 ?>">Prev</a>
+        <a class="btn btn-sm fw-bold btn-outline-light" href="?q=<?php echo urlencode($pageSearch); ?>&page=<?php echo $page - 1 ?>">Prev</a>
       <?php endif ?>
 
       <?php
@@ -198,11 +198,11 @@ $categories = $db->query($category_query)->fetchAll();
 
       for ($i = $start_page; $i <= $end_page; $i++):
       ?>
-        <a class="btn btn-sm fw-bold btn-outline-light <?php echo ($i == $page) ? 'active' : ''; ?>" href="?q=<?php echo urlencode($pageCategory); ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+        <a class="btn btn-sm fw-bold btn-outline-light <?php echo ($i == $page) ? 'active' : ''; ?>" href="?q=<?php echo urlencode($pageSearch); ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
       <?php endfor ?>
 
       <?php if ($page < $total_pages): ?>
-        <a class="btn btn-sm fw-bold btn-outline-light" href="?q=<?php echo urlencode($pageCategory); ?>&page=<?php echo $page + 1 ?>">Next</a>
+        <a class="btn btn-sm fw-bold btn-outline-light" href="?q=<?php echo urlencode($pageSearch); ?>&page=<?php echo $page + 1 ?>">Next</a>
       <?php endif ?>
     </div>
     <script>
