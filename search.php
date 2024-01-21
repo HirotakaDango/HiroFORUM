@@ -102,7 +102,7 @@ $categories = $db->query($category_query)->fetchAll();
                   <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
                 </div>
                 <a class="btn btn-dark btn-sm fw-medium rounded-pill link-body-emphasis mb-2" href="category.php?q=<?php echo urlencode($post['category']); ?>"><?php echo str_replace('_', ' ', $post['category']); ?></a>
-                <h5 class="mb-2 fw-bold"><?php echo $post['title']; ?></h5>
+                <h5 class="mb-3 fw-bold"><?php echo $post['title']; ?></h5>
                 <div>
                   <?php
                     if (!function_exists('getYouTubeVideoId')) {
