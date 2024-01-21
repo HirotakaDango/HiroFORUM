@@ -173,20 +173,6 @@ $categories = $db->query($category_query)->fetchAll();
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-outline-light rounded-pill border-0 btn-sm position-fixed end-0 bottom-0 m-2 fw-medium" data-bs-toggle="modal" data-bs-target="#exampleModal">help</button>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0">
-          <div class="modal-header border-0">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Help</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            If you want to upload image, use image link address, only support jpg, jpeg, png, and gif.
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="pagination my-4 justify-content-center gap-2">
       <?php if ($page > 1): ?>
         <a class="btn btn-sm fw-bold btn-outline-light" href="?q=<?php echo urlencode($pageCategory); ?>&page=<?php echo $page - 1 ?>">Prev</a>
