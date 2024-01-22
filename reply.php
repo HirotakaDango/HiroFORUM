@@ -103,10 +103,10 @@ $categories = $db->query($category_query)->fetchAll();
               </li>
             </ol>
           </nav>
-          <div class="card rounded-4 bg-body-tertiary border-0 mb-5 fw-medium">
+          <div class="card rounded-4 bg-body-tertiary border-0 mb-5">
             <div class="card-body">
               <div class="d-flex mb-3">
-                <small class="small fw-medium">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
+                <small class="small">Thread by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $post['userid']; ?>"><?php echo (mb_strlen($post['username']) > 15) ? mb_substr($post['username'], 0, 15) . '...' : $post['username']; ?></a>・<?php echo (new DateTime($post['date']))->format("Y/m/d - H:i:s"); ?></small>
               </div>
               <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['userid']): ?>
                 <a class="btn btn-sm border-0 m-2 position-absolute top-0 end-0 link-body-emphasis" href="edit.php?id=<?php echo $post['id']; ?>"><i class="bi bi-pencil-fill"></i></a>
@@ -180,7 +180,7 @@ $categories = $db->query($category_query)->fetchAll();
             <div class="card rounded-4 bg-body-tertiary border-0 mt-1">
               <div class="card-body">
                 <div class="d-flex mb-3">
-                  <small class="small fw-medium">Reply by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $comment['userid']; ?>"><?php echo (mb_strlen($comment['username']) > 15) ? mb_substr($comment['username'], 0, 15) . '...' : $comment['username']; ?></a>・<?php echo (new DateTime($comment['date']))->format("Y/m/d - H:i:s"); ?></small>
+                  <small class="small">Reply by <a class="link-body-emphasis text-decoration-none" href="user.php?id=<?php echo $comment['userid']; ?>"><?php echo (mb_strlen($comment['username']) > 15) ? mb_substr($comment['username'], 0, 15) . '...' : $comment['username']; ?></a>・<?php echo (new DateTime($comment['date']))->format("Y/m/d - H:i:s"); ?></small>
                   <?php if ($user && $comment['username'] == $user['username']): ?>
                     <a href="reply.php?action=delete&commentId=<?php echo $comment['id']; ?>&id=<?php echo $id; ?>" style="max-height: 30px;" onclick="return confirm('Are you sure?');" class="btn btn-outline-light border-0 btn-sm ms-auto"><i class="bi bi-trash-fill"></i></a>
                   <?php endif; ?>
