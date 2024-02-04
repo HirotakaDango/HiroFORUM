@@ -37,7 +37,7 @@ if (isset($_POST['submit'])) {
         <label for="floatingInput" class="fw-bold"><small>Enter title</small></label>
       </div>
       <div class="form-floating mb-2">
-        <select class="form-select border rounded border-3 fw-bold focus-ring focus-ring-dark py-0 text-start" name="category">
+        <select class="form-select border rounded border-3 fw-bold focus-ring focus-ring-dark py-0 text-start" name="category" required>
           <option class="form-control" value="">Add category:</option>
           <?php
             // Loop through each category and create an option in the dropdown list

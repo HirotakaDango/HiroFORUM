@@ -43,14 +43,14 @@ if (isset($_GET['id'])) {
   </head>
   <body>
     <?php include('header.php'); ?>
-    <form method="post" class="container my-4">
+    <form method="post" class="container mt-3 mb-2">
       <input type="hidden" name="post_id" value="<?php echo $post_id ?>">
       <div class="form-floating mb-2">
         <input class="form-control rounded border-3 focus-ring focus-ring-dark" type="text" name="title" placeholder="Enter title" maxlength="100" required value="<?php echo $post['title'] ?>">  
         <label for="floatingInput" class="fw-bold"><small>Enter title</small></label>
       </div>
       <div class="form-floating mb-2">
-        <select class="form-select border rounded border-3 fw-bold focus-ring focus-ring-dark py-0 text-start" name="category">
+        <select class="form-select border rounded border-3 fw-bold focus-ring focus-ring-dark py-0 text-start" name="category" required>
           <?php
             // Loop through each category and create an option in the dropdown list
             foreach ($results as $row) {
