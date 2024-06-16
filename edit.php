@@ -40,6 +40,12 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php include('bootstrapcss.php'); ?>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta property="og:url" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HiroFORUM">
+    <meta property="og:description" content="This is just a simple forum.">
+    <meta property="og:image" content="/favicon.svg">
   </head>
   <body>
     <?php include('header.php'); ?>

@@ -54,8 +54,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>If you want to upload image, use image link address, only support jpg, jpeg, png, and gif.</p>
-            <p>example: https://i.imgur.com/8e3UNUk.png</p>
+            <p>If you want to upload/display image and youtube, use image link address, only support jpg, jpeg, png, and gif. Make sure to use "http/https"</p>
+            <p>image link example: https://i.imgur.com/8e3UNUk.png</p>
+            <p>youtube link example: https://www.youtube.com/watch?v=</p>
           </div>
         </div>
       </div>
